@@ -18,7 +18,7 @@ class CipherTest extends PHPUnit_Framework_TestCase
         if (!is_dir(__DIR__ . '/tmp/out')) {
             mkdir(__DIR__ . '/tmp/out');
         }
-        
+
         $word = str_shuffle('abcdef');
 
         $data = str_repeat($word, rand(10, 30));

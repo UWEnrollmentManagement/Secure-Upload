@@ -6,6 +6,17 @@ namespace UWDOEM\SecureUploads;
 class Cipher
 {
 
+    public static function cleanFilename($filename)
+    {
+        return preg_replace(
+            '/[^A-Za-z0-9_\-]/', '_',
+            htmlentities(pathinfo($filename, PATHINFO_FILENAME))
+        ) . '.' . preg_replace(
+            '/[^A-Za-z0-9_\-]/', '_',
+            htmlentities(pathinfo($filename, PATHINFO_EXTENSION))
+        );
+    }
+
     /**
      * Encrypt a file specified in the $_FILES global.
      *
@@ -78,13 +89,7 @@ class Cipher
             $info = json_decode(gzuncompress($decryptedInfo), true);
 
             /** @var string $filename */
-            $filename = preg_replace(
-                    '/[^A-Za-z0-9_\-]/', '_',
-                    htmlentities(pathinfo($info['name'], PATHINFO_FILENAME))
-                ) . '.' . preg_replace(
-                    '/[^A-Za-z0-9_\-]/', '_',
-                    htmlentities(pathinfo($info['name'], PATHINFO_EXTENSION))
-                );
+            $filename = static::cleanFilename($info['name']);
 
             file_put_contents("$destination/$filename", gzuncompress($decryptedData));
         } else {
