@@ -11,6 +11,14 @@ class CipherTest extends PHPUnit_Framework_TestCase
 {
     public function testEncryptDecrypt()
     {
+        if (!is_dir(__DIR__ . '/tmp')) {
+            mkdir(__DIR__ . '/tmp');
+        }
+
+        if (!is_dir(__DIR__ . '/tmp/out')) {
+            mkdir(__DIR__ . '/tmp/out');
+        }
+        
         $word = str_shuffle('abcdef');
 
         $data = str_repeat($word, rand(10, 30));
@@ -29,14 +37,6 @@ class CipherTest extends PHPUnit_Framework_TestCase
         ];
 
         $location = Cipher::encrypt('test-data', __DIR__ . '/tmp', __DIR__ . '/certs/publickey.cer');
-
-        if (!is_dir(__DIR__ . '/tmp')) {
-            mkdir(__DIR__ . '/tmp');
-        }
-
-        if (!is_dir(__DIR__ . '/tmp/out')) {
-            mkdir(__DIR__ . '/tmp/out');
-        }
 
         Cipher::decrypt($location, __DIR__ . '/tmp/out/' , __DIR__ . '/certs/privatekey.pem');
 
