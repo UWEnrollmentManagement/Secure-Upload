@@ -1,0 +1,15 @@
+{
+  "name": "uwdoem/secure-upload",
+  "description": "Secure file upload with asymmetric encryption.",
+  "autoload": {
+    "classmap": [
+      "src/"
+    ]
+  },
+  "require-dev": {
+    "phpdocumentor/phpdocumentor": "2.7.*",
+    "phpunit/phpunit": "4.5.*",
+    "codeclimate/php-test-reporter": "dev-master",
+    "athens/standard": "*"
+  }
+}
