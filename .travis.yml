@@ -10,6 +10,6 @@ before_script:
   - sed -i '/phpdoc/d' composer.json
   - composer install
 script:
-  - phpunit --configuration test
+  - phpunit --configuration test/phpunit.xml test
 after_script:
   - vendor/bin/test-reporter
