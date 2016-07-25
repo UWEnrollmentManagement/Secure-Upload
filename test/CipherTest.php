@@ -6,7 +6,6 @@ use PHPUnit_Framework_TestCase;
 
 use UWDOEM\SecureUploads\Cipher;
 
-
 class CipherTest extends PHPUnit_Framework_TestCase
 {
     public function testEncryptDecrypt()
@@ -31,12 +30,7 @@ class CipherTest extends PHPUnit_Framework_TestCase
 
         file_put_contents($fileLocation, $data);
 
-        $_FILES['test-data'] = [
-            'tmp_name' => $fileLocation,
-            'name' => $filename,
-        ];
-
-        $location = Cipher::encrypt('test-data', __DIR__ . '/tmp', __DIR__ . '/certs/publickey.cer');
+        $location = Cipher::encrypt($filename, $fileLocation, __DIR__ . '/tmp', __DIR__ . '/certs/publickey.cer');
 
         Cipher::decrypt($location, __DIR__ . '/tmp/out/' , __DIR__ . '/certs/privatekey.pem');
 

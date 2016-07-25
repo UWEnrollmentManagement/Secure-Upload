@@ -20,20 +20,21 @@ class Cipher
     /**
      * Encrypt a file specified in the $_FILES global.
      *
-     * @param string $fileHandle
+     * @param string $name
+     * @param string $location
      * @param string $destination
      * @param string $publicKeyLocation
      * @return string
      */
-    public static function encrypt($fileHandle, $destination, $publicKeyLocation)
+    public static function encrypt($name, $location, $destination, $publicKeyLocation)
     {
         /** @var resource $publicKey */
         $publicKey = openssl_get_publickey(file_get_contents($publicKeyLocation));
 
         /** @var string $data */
-        $data = file_get_contents($_FILES[$fileHandle]['tmp_name']);
+        $data = file_get_contents($location);
         /** @var string $info */
-        $info = json_encode($_FILES[$fileHandle]);
+        $info = json_encode(['name' => $name]);
 
         openssl_seal(gzcompress($data), $encryptedData, $dataKeys, [$publicKey]);
         openssl_seal(gzcompress($info), $encryptedInfo, $infoKeys, [$publicKey]);
