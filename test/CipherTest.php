@@ -21,7 +21,7 @@ class CipherTest extends PHPUnit_Framework_TestCase
         $word = str_shuffle('abcdef');
 
         $data = str_repeat($word, rand(10, 30));
-        for($i = 0; $i < 100; $i++) {
+        for ($i = 0; $i < 100; $i++) {
             $data .= str_shuffle('abcdefeghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
         }
 
@@ -32,7 +32,7 @@ class CipherTest extends PHPUnit_Framework_TestCase
 
         $location = Cipher::encrypt($filename, $fileLocation, __DIR__ . '/tmp', __DIR__ . '/certs/publickey.cer');
 
-        Cipher::decrypt($location, __DIR__ . '/tmp/out/' , __DIR__ . '/certs/privatekey.pem');
+        Cipher::decrypt($location, __DIR__ . '/tmp/out/', __DIR__ . '/certs/privatekey.pem');
 
         // Delete everything in the tmp directory
         array_map('unlink', glob(__DIR__ . "/tmp/out/*"));

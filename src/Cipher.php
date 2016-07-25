@@ -2,17 +2,29 @@
 
 namespace UWDOEM\SecureUploads;
 
-
+/**
+ * Class Cipher encrypts and decrypts files using public key cryptography.
+ *
+ * @package UWDOEM\SecureUploads
+ */
 class Cipher
 {
 
+    /**
+     * White list scrub of file name.
+     *
+     * @param string $filename
+     * @return string
+     */
     public static function cleanFilename($filename)
     {
         return preg_replace(
-            '/[^A-Za-z0-9_\-]/', '_',
+            '/[^A-Za-z0-9_\-]/',
+            '_',
             htmlentities(pathinfo($filename, PATHINFO_FILENAME))
         ) . '.' . preg_replace(
-            '/[^A-Za-z0-9_\-]/', '_',
+            '/[^A-Za-z0-9_\-]/',
+            '_',
             htmlentities(pathinfo($filename, PATHINFO_EXTENSION))
         );
     }
@@ -85,7 +97,7 @@ class Cipher
         /** @var boolean $infoWasDecrypted */
         $infoWasDecrypted = openssl_open($encryptedInfo, $decryptedInfo, $infoKey, $privateKeyId);
 
-        if ($dataWasDecrypted && $infoWasDecrypted) {
+        if ($dataWasDecrypted === true && $infoWasDecrypted === true) {
             /** @var string[] $info */
             $info = json_decode(gzuncompress($decryptedInfo), true);
 
@@ -101,5 +113,4 @@ class Cipher
 
         return "$destination/$filename";
     }
-
 }
