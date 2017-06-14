@@ -33,8 +33,9 @@ You should put the public copy of your key (`my_key_name.pub`) onto your web ser
 
 ### Sample Web Application
 
+Web application structure:
 ```
-myapp
+mywebapp
 ├── composer.json
 ├── index.php
 ├── cert
@@ -43,6 +44,10 @@ myapp
 └── uploads
     └── .htaccess
 ```
+
+The `uploads` directory must be writable to your Apache user. For example, you might use `chmod o+w uploads`.
+
+The `composer.json` specifies the `uwdoem/secure-upload` package as a requirement. You'll need to run `composer install` to install this package and the `vendor` directory.
 
 composer.json:
 ```
@@ -53,15 +58,20 @@ composer.json:
 }
 ```
 
+
+We place `.htaccess` files that block visitor access to the `cert` and `uploads` directories.
+
 cert/.htaccess:
 ```
 deny from all
 ```
-
 uploads/.htaccess:
 ```
 deny from all
 ```
+
+
+The `index.php` is our primary page.
 
 index.php:
 ```
@@ -123,7 +133,90 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') { ?>
 
 <?php
 }
-
 ```
 
 
+For each file that is uploaded, four encryption files will be created. For example `719b5e92a27aefb858982131e8d3be56.data`, `719b5e92a27aefb858982131e8d3be56.data.key`, `719b5e92a27aefb858982131e8d3be56.info`, and `719b5e92a27aefb858982131e8d3be56.info.key`. Each uploaded file will have its own unique hash, prefixing the `.data`, `.data.key`, `.info`, and `.info.key` files.
+
+All four of these files must be moved to your decryption script in order to decrypt the uploaded file.
+
+
+### Sample Decryption Script
+
+In the tree below, I have uploaded two documents using the web application above and moved the resulting files into my decryption scrypt:
+
+```
+mydecrypter
+├── cert
+│   └── my_key_name.pem
+├── composer.json
+├── decrypt.php
+├── in
+│   ├── 719b5e92a27aefb858982131e8d3be56.data
+│   ├── 719b5e92a27aefb858982131e8d3be56.data.key
+│   ├── 719b5e92a27aefb858982131e8d3be56.info
+│   ├── 719b5e92a27aefb858982131e8d3be56.info.key
+│   ├── 7a3f189af2fc309128e144f2fc3d419e.data
+│   ├── 7a3f189af2fc309128e144f2fc3d419e.data.key
+│   ├── 7a3f189af2fc309128e144f2fc3d419e.info
+│   └── 7a3f189af2fc309128e144f2fc3d419e.info.key
+├── out
+└── processed
+```
+
+The `composer.json` specifies the `uwdoem/secure-upload` package as a requirement. You'll need to run `composer install` to install this package and the `vendor` directory.
+
+composer.json:
+```
+{
+    "require": {
+        "uwdoem/secure-upload": "^0.2.0"
+    }
+}
+```
+
+
+Here is the script which performs the decryption. Having placed your encrypted data files into the `in` directory, you would invoke the script using `php decrypt.php`.
+
+decrypt.php:
+```
+<?php
+
+require_once dirname(__FILE__) . '/vendor/autoload.php';
+
+use UWDOEM\SecureUploads\Cipher;
+
+
+// The directory where the encrypted files are
+$in = __DIR__ . '/in/';
+
+// The directory that files shall be decrypted to
+$out = __DIR__ . '/out/';
+
+// A directory to put encrypted files after they have been decrypted
+$processed = __DIR__ . '/processed/';
+
+// The path to your pirvate key
+$privateKeyLocation = __DIR__ . '/cert/my_key_name.pem';
+
+// Scan through all of the files in the input directory...
+$files = scandir($in);
+foreach ($files as $file) {
+    // If this is a data file...
+    if (pathinfo($file, PATHINFO_EXTENSION) === 'data') {
+
+        // Then identify the hash...
+        $hash = strtok($file, '.');
+
+        // Decrypt the file to the $out directory...
+        Cipher::decrypt($in . $file, $out, $privateKeyLocation);
+
+        // And move all of the encrypted/key/data files for this upload into
+        // the $processed directory.
+        foreach (["data", "data.key", "info", "info.key"] as $suffix) {
+            rename("$in//$hash.$suffix", "$processed//$hash.$suffix");
+        }
+    }
+}
+
+```
