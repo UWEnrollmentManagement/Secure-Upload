@@ -31,12 +31,15 @@ To create a private, public key pair in \*nix:
 
 You should put the public copy of your key (`my_key_name.pub`) onto your web server. But you should **not** put the private copy of your key (`my_key_name.pem`) onto your web server. The private copy of your key will need to be on your file server.
 
-### Sample Application
+### Sample Web Application
 
 ```
 myapp
 ├── composer.json
 ├── index.php
+├── cert
+    ├── .htaccess
+    └── my_key_name.pub
 └── uploads
     └── .htaccess
 ```
@@ -50,9 +53,76 @@ composer.json:
 }
 ```
 
+cert/.htaccess:
+```
+deny from all
+```
+
 uploads/.htaccess:
 ```
 deny from all
+```
+
+index.php:
+```
+<?php
+
+require_once(__DIR__ . '/vendor/autoload.php');
+
+use UWDOEM\SecureUploads\Cipher;
+
+// Turn on error reporting, but only for troubleshooting and development
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+if ($_SERVER['REQUEST_METHOD'] === 'GET') { ?>
+
+<html>
+<body>
+<form method="POST" action="." enctype="multipart/form-data">
+    <input type="file" name="myFile">
+    <input type="submit" value="Submit">
+</form>
+</body>
+</html>
+
+<?php } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    $thereWereUploadErrors = $_FILES['myFile']['error'] || $_FILES['myFile']['size'] === 0;
+    if ($thereWereUploadErrors) { echo "Error uploading document"; die(); }
+
+    // The path to your public key
+    $publicKeyLocation = __DIR__ . '/cert/my_key_name.pub';
+
+    // The path of the file, as uploaded by Apache
+    $fileLocation = $_FILES['myFile']['tmp_name'];
+
+    // The path to your uploads directory, where encrypted files shall be
+    // stored.
+    $destination = __DIR__ . '/uploads/';
+
+    // The name of the uploaded file, as chosen by the submitter
+    $oldFilename = $_FILES['myFile']['name'];
+
+    // Here we determine what the name of the file will be when it is
+    // decrypted onto the file server. The `Cipher` class provides a static
+    // method for "scrubbing" the file name, but you could also choose to
+    // prepend the file name with some identifying information, such as the
+    // visitor's UWNetID, if you're forcing NetID authentication.
+    $newFilename = Cipher::cleanFilename($oldFilename);
+
+    Cipher::encrypt($newFilename, $fileLocation, $destination, $publicKeyLocation);
+
+    ?>
+<html>
+<body>
+<p>Your file has been uploaded.</p>
+</body>
+</html>
+
+<?php
+}
 
 ```
 
