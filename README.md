@@ -12,6 +12,7 @@ Using this library involves three main components:
 
 Note that the private key does not live on web server. If an attacker were to gain read-access to your web server while there were documents waiting to be moved to your file server, then the attacker would only see a set of encrypted documents and they would not be able to retrieve the private key which would give them the ability to decrypt these documents.
 
+
 ## Example
 
 For this example, we assume that:
@@ -19,6 +20,8 @@ For this example, we assume that:
 1. Your web server is running Apache, \*nix, and of course PHP.
 2. Your file server may be either \*nix or Windows.
 3. We use (Composer)[https://getcomposer.org/] for package management, but you can modify the example to work without Composer.
+
+This example *does not answer* how to move the encrypted files from the web server to the file server. On \*nix, you might choose to move them with an `rsync --delete ...` command. On Windows, you could use WinSCP. Using an `authorized_keys` file, it's possible to create an automated job on either \*nix or Windows which could move these files over automatically.
 
 ### Create a Private/Public Key Pair
 
