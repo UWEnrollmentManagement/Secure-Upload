@@ -30,7 +30,7 @@ class Cipher
     }
 
     /**
-     * Encrypt a file specified in the $_FILES global.
+     * Encrypt a specified file.
      *
      * @param string $name              The name that the file shall have when it's decrypted.
      * @param string $location          The current location of the file.
