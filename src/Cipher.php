@@ -13,7 +13,7 @@ class Cipher
     /**
      * White list scrub of file name.
      *
-     * @param string $filename
+     * @param string $filename A filename to be cleaned of potentially troublesome characters.
      * @return string
      */
     public static function cleanFilename($filename)
@@ -32,11 +32,11 @@ class Cipher
     /**
      * Encrypt a file specified in the $_FILES global.
      *
-     * @param string $name
-     * @param string $location
-     * @param string $destination
-     * @param string $publicKeyLocation
-     * @return string
+     * @param string $name              The name that the file shall have when it's decrypted.
+     * @param string $location          The current location of the file.
+     * @param string $destination       The folder into which you wish to encrypt the file.
+     * @param string $publicKeyLocation The location of the public key to encrypt to.
+     * @return string                   The path of the newly encrypted file.
      */
     public static function encrypt($name, $location, $destination, $publicKeyLocation)
     {
@@ -66,10 +66,10 @@ class Cipher
     }
 
     /**
-     * @param string $filePath
-     * @param string $destination
-     * @param string $privateKeyLocation
-     * @return string
+     * @param string $filePath           The path of the file you'd like to decrypt.
+     * @param string $destination        The directory to which you'd like to decrypt this file.
+     * @param string $privateKeyLocation The location of the private key to use to decrypt the file.
+     * @return string                    The path of the newly decrypted file.
      * @throws \Exception if ::decrypt is not able to decrypt the files.
      */
     public static function decrypt($filePath, $destination, $privateKeyLocation)
